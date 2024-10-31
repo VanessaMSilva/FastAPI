@@ -1,10 +1,12 @@
 from fastapi import FastAPI, Depends, status, HTTPException
 import model
 import webScraping
+import bus050
+import intercampi 
 from database import engine, get_db
 from sqlalchemy.orm import Session
 import classes
-from typing import List
+from typing import List, Dict
 from fastapi.middleware.cors import CORSMiddleware
 
 model.Base.metadata.create_all(bind=engine)
@@ -47,6 +49,12 @@ app.add_middleware(
  allow_headers=['*']
 )
 
+@app.get("/horarios/")
+async def get_horarios() -> Dict[str, List[str]]:
+    return {
+        "horariosChegada050": bus050.get_horario_050(),
+        "horariosSaidaIntercampi": intercampi.get_horario_intercampi()
+    }
 
 @app.get("/mensagens", response_model=List[classes.Menu_msg], status_code=status.HTTP_200_OK)
 async def buscar_valores(db: Session = Depends(get_db), skip: int = 0, limit: int=100):

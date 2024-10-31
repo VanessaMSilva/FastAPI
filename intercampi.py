@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-def return_dado():
+def get_horario_intercampi():
     r = requests.get('https://proae.ufu.br/intercampi')
 
     if (r.status_code == 200):
@@ -17,4 +17,4 @@ def return_dado():
     else:
         print(f"Erro ao acessar o site: Status {r.status_code}")
         return None
-return_dado()
+get_horario_intercampi()
