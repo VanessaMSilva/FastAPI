@@ -11,7 +11,6 @@ def get_horario_intercampi():
         horas = []
         for hora in saida:
             horas.append(str(hora.text))
-            
         return horas
     
     else:
