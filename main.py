@@ -49,7 +49,7 @@ app.add_middleware(
  allow_headers=['*']
 )
 
-@app.get("/horarios/")
+@app.get("/Horario/")
 async def get_horarios() -> Dict[str, List[str]]:
     return {
         "horariosChegada050": bus050.get_horario_050(),
@@ -60,3 +60,41 @@ async def get_horarios() -> Dict[str, List[str]]:
 async def buscar_valores(db: Session = Depends(get_db), skip: int = 0, limit: int=100):
     mensagens = db.query(model.Model_Menu).offset(skip).limit(limit).all()
     return mensagens
+
+@app.post("/vendas/", response_model=classes.VendaOut)
+def cadastrar_venda(venda: classes.VendaCreate, db: Session = Depends(get_db)):
+    db_venda = model.Model_Venda(nome_cliente=venda.nome_cliente, cpf=venda.cpf, produtos=venda.produtos)
+    db.add(db_venda)
+    db.commit()
+    db.refresh(db_venda)
+    return db_venda
+
+# Rota para buscar uma venda pelo CPF
+@app.get("/vendas/{cpf}", response_model=classes.VendaOut)
+def buscar_venda(cpf: str, db: Session = Depends(get_db)):
+    db_venda = db.query(model.Model_Venda).filter(model.Model_Venda.cpf == cpf).first()
+    if not db_venda:
+        raise HTTPException(status_code=404, detail="Venda não encontrada.")
+    return db_venda
+
+# Rota para atualizar uma venda pelo CPF
+@app.put("/vendas/{cpf}", response_model=classes.VendaOut)
+def alterar_venda(cpf: str, venda: classes.VendaUpdate, db: Session = Depends(get_db)):
+    db_venda = db.query(model.Model_Venda).filter(model.Model_Venda.cpf == cpf).first()
+    if not db_venda:
+        raise HTTPException(status_code=404, detail="Venda não encontrada.")
+    db_venda.nome_cliente = venda.nome_cliente
+    db_venda.produtos = venda.produtos
+    db.commit()
+    db.refresh(db_venda)
+    return db_venda
+
+# Rota para excluir uma venda pelo CPF
+@app.delete("/vendas/{cpf}", response_model=dict)
+def excluir_venda(cpf: str, db: Session = Depends(get_db)):
+    db_venda = db.query(model.Model_Venda).filter(model.Model_Venda.cpf == cpf).first()
+    if not db_venda:
+        raise HTTPException(status_code=404, detail="Venda não encontrada.")
+    db.delete(db_venda)
+    db.commit()
+    return {"message": "Venda excluída com sucesso."}
