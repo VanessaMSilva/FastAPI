@@ -19,11 +19,3 @@ class Model_Menu(Base):
     menuNav = Column(String, nullable=False)
     link = Column(String, nullable=False)
     created_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'), nullable=False)
-    
-class Model_Venda(Base):
-    __tablename__ = "vendas"
-
-    id = Column(Integer, primary_key=True, index=True)
-    nome_cliente = Column(String, index=True)
-    cpf = Column(String, unique=True, index=True)
-    produtos = Column(String)
