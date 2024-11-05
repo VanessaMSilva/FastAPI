@@ -4,6 +4,9 @@ on:
   - pull_request
 jobs:
   job1:
+    strategy:
+      matrix:
+        python-version: [3.9]  # Defina a versão compatível
     runs-on: ubuntu-latest
     services:
       postgres:
