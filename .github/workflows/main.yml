@@ -4,7 +4,11 @@ on:
   - pull_request
 jobs:
   job1:
+    strategy:
+      matrix:
+        python-version: [3.9]  # Defina a versão compatível
     runs-on: ubuntu-latest
+
     services:
       postgres:
         image: postgres:13
@@ -14,6 +18,7 @@ jobs:
           POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
         ports:
           - 5173:5173
+
     steps:
       - name: pulling git repo
         uses: actions/checkout@v2
